@@ -21,9 +21,10 @@ defmodule Q.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:postgrex, "~> 0.13.3"},
-      {:jason, "~> 1.0.0"},
-      {:poolboy, "~> 1.5.1"}
+      {:postgrex, "~> 0.13"},
+      {:jason, "~> 1.0"},
+      {:poolboy, "~> 1.5"},
+      {:mappable, "~> 0.2"}
     ]
   end
 end
