@@ -21,7 +21,8 @@ defmodule Q.Exp do
     |> Enum.all?(fn(name) -> Map.get(exp.params, name) != nil end)
   end
 
-  def expand(exp, index) do
+  def expand(exp, index \\ 1)
+  def expand(%Q.Exp{} = exp, index) do
     catches = ~r/\${([\w]+)}/ |> Regex.scan(exp.text)
 
     catches_with_index = Enum.with_index(catches, index)
@@ -30,6 +31,21 @@ defmodule Q.Exp do
     params = Enum.map(catches, fn([_, name]) -> Map.get(exp.params, name) end)
 
     {:ok, text, params, index + length(params)}
+  end
+  def expand(exp, index) when is_list(exp) do
+    expanded_list = expand_list(exp, index)
+
+    text = Enum.map(expanded_list, fn({:ok, text, _, _}) -> text end) |> Enum.join(" ")
+    params = Enum.map(expanded_list, fn({:ok, _, params, _}) -> params end) |> List.flatten()
+
+    {:ok, text, params, index + length(params)}
+  end
+
+  def expand_list([exp], index), do: [expand(exp, index)]
+  def expand_list([exp | tail], index) do
+    {:ok, text, params, next_index} = expand(exp, index)
+
+    [{:ok, text, params, next_index}] ++ expand_list(tail, next_index)
   end
 
   defp do_replace(text, []), do: text
