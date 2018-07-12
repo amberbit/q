@@ -11,7 +11,46 @@ defmodule Q do
     |> Q.Exp.verify!()
   end
 
-  def query(dbname, sql, params \\ []) do
+  def add_exp(exp, text, params \\ %{})
+  def add_exp(exp, text, params) when is_list(exp) do
+    exp ++ [exp(text, params)]
+  end
+  def add_exp(%Q.Exp{} = exp, text, params) do
+    [exp, exp(text, params)]
+  end
+
+  def expand(exp, index \\ 1)
+  def expand(%Q.Exp{} = exp, index) do
+    Q.Exp.expand(exp, index)
+  end
+  def expand(exp, index) when is_list(exp) do
+    expanded_list = expand_list(exp, index)
+
+    text = Enum.map(expanded_list, fn({:ok, text, _, _}) -> text end) |> Enum.join(" ")
+    params = Enum.map(expanded_list, fn({:ok, _, params, _}) -> params end) |> List.flatten()
+
+    {:ok, text, params, index + length(params)}
+  end
+
+  def expand_list([exp], index), do: [expand(exp, index)]
+  def expand_list([exp | tail], index) do
+    {:ok, text, params, next_index} = expand(exp, index)
+
+    [{:ok, text, params, next_index}] ++ expand_list(tail, next_index)
+  end
+
+  def query(dbname, sql, params \\ [])
+  def query(dbname, %Q.Exp{} = expression, []) do
+    {:ok, sql, params, _} = Q.expand(expression)
+
+    query(dbname, sql, params)
+  end
+  def query(dbname, expressions, []) when is_list(expressions) do
+    {:ok, sql, params, _} = Q.expand(expressions)
+
+    query(dbname, sql, params)
+  end
+  def query(dbname, sql, params) do
     pool_name = :"#{dbname}.Pool"
 
     pool_name

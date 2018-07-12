@@ -20,4 +20,20 @@ defmodule Q.Exp do
     |> Enum.map(fn([_, name]) -> name end)
     |> Enum.all?(fn(name) -> Map.get(exp.params, name) != nil end)
   end
+
+  def expand(exp, index) do
+    catches = ~r/\${([\w]+)}/ |> Regex.scan(exp.text)
+
+    catches_with_index = Enum.with_index(catches, index)
+
+    text = do_replace(exp.text, catches_with_index)
+    params = Enum.map(catches, fn([_, name]) -> Map.get(exp.params, name) end)
+
+    {:ok, text, params, index + length(params)}
+  end
+
+  defp do_replace(text, []), do: text
+  defp do_replace(text, [{[pattern, _], num} | tail]) do
+    String.replace(text, pattern, "$#{num}", global: false) |> do_replace(tail)
+  end
 end
