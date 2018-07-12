@@ -1,4 +1,16 @@
 defmodule Q do
+  defmodule ParamsMissingError do
+     defexception message: "one of more SQL parameters are missing"
+  end
+
+  def exp(text, params \\ %{}) do
+    params = Mappable.to_map(params, keys: :strings)
+
+    text
+    |> Q.Exp.build(params)
+    |> Q.Exp.verify!()
+  end
+
   def query(dbname, sql, params \\ []) do
     pool_name = :"#{dbname}.Pool"
 
