@@ -41,7 +41,7 @@ defmodule Q do
     pool_name = :"#{dbname}.Pool"
 
     pool_name
-    |> Postgrex.query!(sql, params, [pool: DBConnection.Poolboy])
+    |> Postgrex.query!(sql, params)
     |> map_result()
   end
 
