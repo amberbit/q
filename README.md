@@ -1,5 +1,8 @@
 # Q
 
+![Q](./assets/q.jpg)
+
+
 **TODO: Add description**
 
 ## Installation
