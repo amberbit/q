@@ -1,3 +1,5 @@
+# NOTE: this is a legacy branch for 0.1 You probably want to check the "main" branch instead
+
 # Q
 
 "Exactly. For that one fraction of a second, you were open to options
