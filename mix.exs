@@ -1,12 +1,24 @@
 defmodule Q.MixProject do
   use Mix.Project
 
+  @version "2.0.0"
+
   def project do
     [
       app: :q,
-      version: "0.1.0",
+      description: "Q makes ad-hoc Ecto queries as simple as snapping your fingers",
+      version: @version,
       elixir: "~> 1.15",
+      build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
+      name: "Q",
+      package: package(),
+      docs: [
+        source_ref: "v#{@version}",
+        main: "readme",
+        source_url: "https://github.com/amberbit/q",
+        extras: ["README.md"]
+      ],
       deps: deps()
     ]
   end
@@ -16,6 +28,14 @@ defmodule Q.MixProject do
     [
       extra_applications: [:logger],
       mod: {Q.Application, []}
+    ]
+  end
+
+  def package do
+    [
+      maintainers: ["Hubert Łępicki"],
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/amberbit/q"}
     ]
   end
 
