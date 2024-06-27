@@ -5,27 +5,37 @@ defmodule Q do
 
   import Ecto.Query, only: [from: 2]
 
+  def where(query_or_source, fitlers \\ %{})
+
+  def where(%Ecto.Query{} = source, filters) do
+    prepare_query(source, filters)
+  end
+
+  def where(source, filters) when is_binary(source) or is_atom(source) do
+    prepare_query(source, filters)
+  end
+
   def all(query_or_source, filters \\ %{}, opts \\ [])
 
   def all(%Ecto.Query{} = source, filters, opts) do
-    query = prepare_query(source, filters)
+    query = where(source, filters)
     find_repo().all(query, opts)
   end
 
   def all(source, filters, opts) when is_binary(source) or is_atom(source) do
-    query = prepare_query(source, filters)
+    query = where(source, filters)
     find_repo().all(query, opts || [])
   end
 
   def one(query_or_source, filters_or_opts \\ nil, opts \\ [])
 
   def one(%Ecto.Query{} = source, filters, opts) do
-    query = prepare_query(source, filters)
+    query = where(source, filters)
     find_repo().one(query, opts || [])
   end
 
   def one(source, filters, opts) when is_binary(source) or is_atom(source) do
-    query = prepare_query(source, filters)
+    query = where(source, filters)
     find_repo().one(query, opts || [])
   end
 

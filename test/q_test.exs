@@ -177,4 +177,41 @@ defmodule QTest do
              )
     end
   end
+
+  describe ".where/2" do
+    test "should refine Ecto.Query it was passed" do
+      query = from(u in "user", where: u.age > 18)
+
+      same_query = Q.where(query)
+
+      assert inspect(query) == inspect(same_query)
+
+      refined_query = Q.where(query, first_name: "John")
+
+      assert inspect(refined_query) ==
+               inspect(from(u in "user", where: u.age > 18, where: u.first_name == ^"John"))
+    end
+
+    test "should support schema as first argument, and accept filters and options" do
+      query = Q.where(QTest.User)
+      assert query == QTest.User
+
+      query = Q.where(QTest.User, %{"first_name" => "John", "deleted_at" => nil})
+
+      assert inspect(query) ==
+               inspect(
+                 from(u in QTest.User,
+                   where: is_nil(u.deleted_at),
+                   where: u.first_name == ^"John"
+                 )
+               )
+
+      query = Q.where("users", %{"first_name" => "John", "deleted_at" => nil})
+
+      assert inspect(query) ==
+               inspect(
+                 from(u in "users", where: is_nil(u.deleted_at), where: u.first_name == ^"John")
+               )
+    end
+  end
 end
