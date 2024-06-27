@@ -40,6 +40,9 @@ users = Q.all(User, %{name: "John"}))
 # or
 users = Q.all(User, %{"name" => "John"})
 
+# You can also pass options to Ecto.Repo:
+users = Q.all(User, %{"name" => "John"}, timeout: :infinity)
+
 # Converts nil to "IS NULL" and assumes you know what you're doing:
 users = Q.all(User, deleted_at: nil)
 
